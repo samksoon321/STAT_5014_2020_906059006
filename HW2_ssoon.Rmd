@@ -1,0 +1,147 @@
+---
+title: "STAT5014 Hwk 2"
+author: "Samuel Soon"
+date: "9/10/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+library(knitr)
+library(stargazer)
+library(broom)
+covid_raw <- fread("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+us <- covid_raw[covid_raw$countriesAndTerritories == 'United_States_of_America',]
+us_filtered <- us[us$month %in% c(6:7),]
+us_filtered$index <- rev(1:dim(us_filtered)[1]) 
+fit<-lm(`Cumulative_number_for_14_days_of_COVID-19_cases_per_100000`~index, data=us_filtered)
+
+
+
+```
+
+# Problem 2
+
+## a.
+
+Since I have a little prior experience with R, my goals for this class will be to strengthen my knowledge of basic R concepts, and hopefully get used to operations such as data tidying, scraping, etc.
+
+### Goals
+
+\begin{itemize}
+\item Improve on creating graphs using ggplot or other software
+\item Learn how to write my own functions for estimating parameters
+\item Learn how to use latex outside of mathematical expressions
+\end{itemize}
+
+## b.
+
+\begin{equation} \phi(x) = \dfrac{1}{\sqrt{2 \pi \sigma^2}} e^{(\dfrac{-(x - \mu)}{\sqrt{2}\sigma})^2}\end{equation}
+
+\begin{equation} f_X(x) = {n \choose x}p^x(1-p)^{n-x}\end{equation}
+
+\begin{equation} f_X(x) = 0.5, a \leq x \leq a + 2 \end{equation}
+
+# Problem 3
+
+\begin{itemize}
+\item Step 1: Results of interest should have their related procedures, parameters, and so on recorded down for reproduceability. 
+
+In projects requiring collaboration between multiple people, it could be difficult to create a centralized archive of steps taken.
+
+
+\item Step 2: Manual computation is often inefficient and prone to human error. Automating processes outside of specific situations allows for more consistently effective analysis.
+
+Some processes are so esoteric that automating may be deemed inefficient compared to the time it takes to manually calculate a result.
+
+
+\item Step 3: Because of the various dependencies certain versions of programs may require, saving current versions will help ensure that results can be easily reproduced, and won't be lost due to version updates of related programs.
+
+Saving virtual machines for every version of an experiment might be expensive in terms of computer storage?
+
+\item Step 4: Keeping track of custom scrips is necessary for ensuring that certain results can be 100% reproduced, as even small changes to code permanently change results if changes are not kept track of.
+
+Human error may make keeping track of every change in code difficult.
+
+\item Step 5: Intermediate results provide a good view of the consequences of idiosyncrasies within procedures. Recording intermediate results allows processes to be examined in more detail, which gives a greater understanding of the final result.
+
+People can be lazy.
+
+\item Step 6: Since analysis often uses random variables to draw conclusions from, and seeds are used to approximate randomness, archiving the seed used in an experiment allows results of the experiment to be reproduced in the future.
+
+Saving the seed may not be useful to other parties if they do not also know the algorithm for random number generation you used.
+
+\item Step 7: In analysis, data often needs to be readjusted for tidying purposes, or data transformation. In these cases, it is helpful to have raw data saved, as said data can easily be transformed. If the data is not stored, the analysis will have to be done again, wasting time.
+
+Again, human error can cause raw data to be lost.
+
+\item Step 8: When presenting findings, it is helpful for readers if you provide ways to further learn about the details of your research. Within an article, links or references to more detailed articles should be provided, so that the audience can easily examine your findings in greater detail.
+
+You may not necessarily have access to resources that help your audience with understanding your research.
+
+\item Step 9: When drawing conclusions, it is best if you include references to results early on, so that audiences can examine results themselves, and track down the sources of your conclusions.
+
+Audiences may not be familiar with your presented material. You may need to take steps to ease readers in to what your research deals with.
+
+\item Step 10: All non-confidential contents of your research should be available to the public, so that they can reproduce and verify your results.
+
+In certain cases, results may not be able to be reproduced without confidential information being given.
+
+\end{itemize}
+
+# 4.
+
+## a.
+
+```{r 4a, echo=FALSE}
+print("Summary Table:")
+
+kable(summary(us_filtered), "simple")
+
+print("There are 3 time points: Day, Month, Year.")
+
+print("Number of Missing Values in Each Column:")
+
+colSums(is.na(us_filtered))
+
+
+print("LM Summary:")
+
+
+s <-stargazer(fit, type="text")
+
+
+```
+
+## b.
+
+```{r 4b, echo=FALSE}
+fit.diags <- broom::augment(fit)
+plot(fit,1)
+plot(fit,2)
+plot(fit,3)
+plot(fit,5)
+```
+
+##  c.
+
+```{r 4c, echo=FALSE}
+
+acf(fit$residuals)
+
+```
+
+# 5.
+
+```{r 5, echo=FALSE}
+par(mfrow = c(2,2))
+plot(fit,1)
+plot(fit,2)
+plot(fit,3)
+plot(fit,5)
+```
