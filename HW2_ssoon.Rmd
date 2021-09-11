@@ -139,7 +139,10 @@ acf(fit$residuals)
 # 5.
 
 ```{r 5, echo=FALSE}
-par(mfrow = c(2,2))
+# I tried playing with layout() for a little but I think this ends up looking the best...
+
+par(mfrow= c(2,2))
+
 plot(fit,1)
 plot(fit,2)
 plot(fit,3)
