@@ -15,6 +15,8 @@ library(data.table)
 library(knitr)
 library(stargazer)
 library(broom)
+library(ggplot2)
+library(gridExtra)
 covid_raw <- fread("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
 us <- covid_raw[covid_raw$countriesAndTerritories == 'United_States_of_America',]
 us_filtered <- us[us$month %in% c(6:7),]
@@ -122,10 +124,30 @@ s <-stargazer(fit, type="text")
 
 ```{r 4b, echo=FALSE}
 fit.diags <- broom::augment(fit)
-plot(fit,1)
-plot(fit,2)
-plot(fit,3)
-plot(fit,5)
+
+rvf <- ggplot(fit.diags, aes(x=.fitted, y=.resid))+
+  geom_point() +
+  labs(x="Fitted", y="Residuals", title="Residuals vs Fitted")
+rvf
+
+
+qq <- ggplot(fit.diags, aes(x=qnorm(seq(0.01,0.99,1/(nrow(fit.diags) + 1))), y=.std.resid[order(.std.resid)])) +
+  geom_point() +
+  labs(x="Theoretical Quantiles", y="Standardized Residuals", title="Normal QQ")
+qq
+
+sl <- ggplot(fit.diags, aes(x=.fitted, y=sqrt(abs(.std.resid))))+
+  geom_point() +
+  labs(x="Fitted", y="Sqrt Standardized Residuals", title="Scale-Location")
+
+sl
+
+rvl <- ggplot(fit.diags, aes(x=.hat, y=.std.resid))+
+  geom_point() +
+  labs(x="Leverage", y="Standardized Residuals", title="Residuals vs Leverage")
+rvl
+
+
 ```
 
 ##  c.
@@ -139,12 +161,6 @@ acf(fit$residuals)
 # 5.
 
 ```{r 5, echo=FALSE}
-# I tried playing with layout() for a little but I think this ends up looking the best...
 
-par(mfrow= c(2,2))
-
-plot(fit,1)
-plot(fit,2)
-plot(fit,3)
-plot(fit,5)
+grid.arrange(rvf, qq, sl, rvl, ncol = 2, nrow = 2)
 ```
