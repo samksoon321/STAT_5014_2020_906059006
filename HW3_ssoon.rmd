@@ -27,14 +27,15 @@ fit.diags <- broom::augment(fit)
 
 ```{r p3}
 
-
+head(fit.diags)
 rvf <- ggplot(fit.diags, aes(x=.fitted, y=.resid))+
   geom_point() +
   labs(x="Fitted", y="Residuals", title="Residuals vs Fitted")
 rvf
 
 
-qq <- ggplot(fit.diags, aes(x=qnorm(seq(0.01,0.99,1/(nrow(fit.diags) + 1))), y=.std.resid[order(.std.resid)])) +
+qq <- ggplot(fit.diags, aes(x=qnorm(seq(0.01,0.99,1/(nrow(fit.diags) + 1))),
+                            y=.std.resid[order(.std.resid)])) +
   geom_point() +
   labs(x="Theoretical Quantiles", y="Standardized Residuals", title="Normal QQ")
 qq
